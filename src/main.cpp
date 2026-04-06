@@ -4,13 +4,14 @@
 #include <HTTPClient.h>
 #include <WiFiClientSecure.h>
 #include <ArduinoJson.h>
+#include "icons.h"
 
 
 int lcdColumns = 16;
 int lcdRows = 2;
 int tempF = 0;
 
-const unsigned long fiveMinutes = 1 * 60 * 1000UL; 
+const unsigned long refreshRate = 1 * 60 * 1000UL; // 1 minute in milliseconds
 unsigned long previousMillis = 0;
 
 String weather = "";
@@ -22,82 +23,6 @@ String api_url = "https://api.weather.gov/stations/KBMG/observations/latest";
 LiquidCrystal_I2C lcd(0x27, lcdColumns, lcdRows);  
 
 
-byte sunChar[] = {
-  0b00100,
-  0b10101,
-  0b01110,
-  0b11111,
-  0b01110,
-  0b10101,
-  0b00100,
-  0b00000
-};
-
-byte moonChar[] = {
-  0b01110,
-  0b00111,
-  0b00011,
-  0b00011,
-  0b00011,
-  0b00011,
-  0b00111,
-  0b11110
-};
-
-byte rainChar[] = {
-  0b00000,
-  0b00100,
-  0b00110,
-  0b01110,
-  0b11111,
-  0b11111,
-  0b01110,
-  0b00000
-};
-
-byte snowChar[] = {
-  0b00000,
-  0b10101,
-  0b01110,
-  0b01010,
-  0b01110,
-  0b10101,
-  0b00000,
-  0b00000
-};
-
-byte cloudChar[] = {
-  0b00000,
-  0b01100,
-  0b11110,
-  0b11111,
-  0b00000,
-  0b00110,
-  0b01111,
-  0b00000
-};
-
-byte windChar[] = {
-  0b00000,
-  0b00111,
-  0b00001,
-  0b11110,
-  0b11100,
-  0b10010,
-  0b00110,
-  0b00000
-};
-
-byte boltChar[] = {
-  0b00001,
-  0b00010,
-  0b00110,
-  0b01100,
-  0b00110,
-  0b01100,
-  0b01000,
-  0b10000
-};
 
 
 bool containsIgnoreCase(String mainString, String subString) {
@@ -131,7 +56,7 @@ void getTemperature() {
         JsonDocument doc;
         deserializeJson(doc, payload);
 
-          float tempC = doc["properties"]["temperature"]["value"];
+          float tempC = doc["properties"]["tempeprintCenterrature"]["value"];
           float tempF_float = tempC * 9.0 / 5.0 + 32.0;
 
           weather = doc["properties"]["textDescription"].as<String>();
@@ -183,7 +108,7 @@ void setup(){
 void loop(){
 
   lcd.setCursor(6, 0);
-  lcd.print(tempF, 1);
+  lcd.print(tempF);
   lcd.print((char)223);
   lcd.print("F");
 
@@ -216,7 +141,7 @@ void loop(){
   delay(20000);
   lcd.clear();
 
-  if (millis() - previousMillis >= fiveMinutes) {
+  if (millis() - previousMillis >= refreshRate) {
     previousMillis = millis(); // Save the time the function was run
     getTemperature();
   }
