@@ -1,6 +1,8 @@
 #pragma once
 #include <Arduino.h>
 
+// https://api.weather.gov/icons
+
 byte sunChar[] = {
   0b00100,
   0b10101,

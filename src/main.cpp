@@ -18,7 +18,7 @@ String weather = "";
 
 const char* ssid = "Harmony-Student-Crash";
 const char* password = "Spike-They-Putty-67!";
-String api_url = "https://api.weather.gov/stations/KBMG/observations/latest";
+const char* api_url = "https://api.weather.gov/stations/KBMG/observations/latest";
 
 LiquidCrystal_I2C lcd(0x27, lcdColumns, lcdRows);  
 
@@ -44,9 +44,8 @@ bool containsIgnoreCase(String mainString, String subString) {
 
 
 void getTemperature() {
-  
   HTTPClient client = HTTPClient();
-  if (client.begin(api_url.c_str())) {
+  if (client.begin(api_url)) {
     int httpCode = client.GET();
       if (httpCode > 0) {
         String payload = client.getString();
@@ -56,7 +55,8 @@ void getTemperature() {
         JsonDocument doc;
         deserializeJson(doc, payload);
 
-          float tempC = doc["properties"]["tempeprintCenterrature"]["value"];
+          float tempC = doc["properties"]["temperature"]["value"];
+          Serial.println("Temperature in Celsius: " + String(tempC));
           float tempF_float = tempC * 9.0 / 5.0 + 32.0;
 
           weather = doc["properties"]["textDescription"].as<String>();
@@ -103,6 +103,7 @@ void setup(){
     delay(500);
   }
 
+  getTemperature();
 }
 
 void loop(){
@@ -124,15 +125,25 @@ void loop(){
 
     if (containsIgnoreCase(weather, "sun") || containsIgnoreCase(weather, "clear")) {
       lcd.write(0);
-    } else if (containsIgnoreCase(weather, "cloud")) {
+    } 
+    
+    if (containsIgnoreCase(weather, "cloud")) {
       lcd.write(1);
-    } else if (containsIgnoreCase(weather, "snow")) {
-      lcd.createChar(2, snowChar);
-    } else if (containsIgnoreCase(weather, "rain") || containsIgnoreCase(weather, "drizzle")) {
+    } 
+    
+    if (containsIgnoreCase(weather, "snow")) {
+      lcd.write(2);
+    } 
+    
+    if (containsIgnoreCase(weather, "rain") || containsIgnoreCase(weather, "drizzle")) {
       lcd.write(3);
-    } else if (containsIgnoreCase(weather, "wind") || containsIgnoreCase(weather, "breezy")) {
+    } 
+    
+    if (containsIgnoreCase(weather, "wind") || containsIgnoreCase(weather, "breezy")) {
       lcd.write(4);
-    } else if (containsIgnoreCase(weather, "thunder") || containsIgnoreCase(weather, "storm")) {
+    } 
+    
+    if (containsIgnoreCase(weather, "thunder") || containsIgnoreCase(weather, "storm")) {
       lcd.write(5);
     }
 
