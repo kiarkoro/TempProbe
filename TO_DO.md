@@ -13,3 +13,12 @@
 
 # Something extra!
 6) `printCenter()` doesn't guard against text longer than 16 chars — long weather descriptions will overflow the display. Truncate to `lcdColumns` before printing. Or you can create a way to have longer text scroll for that lcd line.
+
+# New Stuff
+1) I don't think you are using `#include <WiFiClientSecure.h>` you can probably remove it.
+
+2) Rename your `timestamp` variable to something else. Timestamp has a very specific meaning and is a bit misleading. Maybe something like `dayTime` or `day_night`. 
+
+3) You could make your variables `lcdColumns` and `lcdRows` constant by using the `const` keyword. They never change.
+
+4) `getTemperatue()` function now does way more than just get temp. You should probably rename it to something more descriptive. Maybe `getWeather()` or something like that.
