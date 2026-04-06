@@ -15,6 +15,7 @@ const unsigned long refreshRate = 1 * 60 * 1000UL; // 1 minute in milliseconds
 unsigned long previousMillis = 0;
 
 String weather = "";
+String timestamp = "";
 
 const char* ssid = "Harmony-Student-Crash";
 const char* password = "Spike-They-Putty-67!";
@@ -55,6 +56,10 @@ void getTemperature() {
         JsonDocument doc;
         deserializeJson(doc, payload);
 
+          timestamp = doc["properties"]["icon"].as<String>();
+
+          Serial.println("Timestamp: " + timestamp);
+
           float tempC = doc["properties"]["temperature"]["value"];
           Serial.println("Temperature in Celsius: " + String(tempC));
           float tempF_float = tempC * 9.0 / 5.0 + 32.0;
@@ -73,7 +78,6 @@ void getTemperature() {
 }
 
 void printCenter(String text, int row) {
-  
   int len = text.length();
   int pos = (16 - len) / 2;
   lcd.setCursor(pos, row);
@@ -95,6 +99,7 @@ void setup(){
     lcd.createChar(3, rainChar);
     lcd.createChar(4, windChar);
     lcd.createChar(5, boltChar);
+    lcd.createChar(6, moonChar);
 
   // connect to Wi-Fi network
 
@@ -107,46 +112,39 @@ void setup(){
 }
 
 void loop(){
+  String tempString = String(tempF) + ((char)223) + "F";
 
-  lcd.setCursor(6, 0);
-  lcd.print(tempF);
-  lcd.print((char)223);
-  lcd.print("F");
-
-  lcd.setCursor(10, 0);
- 
-    // if (tempF >= 65) {
-    //   lcd.write(0);
-    // } else if (tempF >= 50) {
-    //   lcd.write(1);
-    // } else if (tempF >= 32) {
-    //   lcd.write(2);
-    // }
-
-    if (containsIgnoreCase(weather, "sun") || containsIgnoreCase(weather, "clear")) {
-      lcd.write(0);
-    } 
+    if (containsIgnoreCase(timestamp, "day")) {
+      if (containsIgnoreCase(weather, "sun") || containsIgnoreCase(weather, "clear")) {
+        tempString += (char)0;
+      }
+    }
     
     if (containsIgnoreCase(weather, "cloud")) {
-      lcd.write(1);
+      tempString += (char)1;
     } 
     
     if (containsIgnoreCase(weather, "snow")) {
-      lcd.write(2);
+      tempString += (char)2;
     } 
     
     if (containsIgnoreCase(weather, "rain") || containsIgnoreCase(weather, "drizzle")) {
-      lcd.write(3);
+      tempString += (char)3;
     } 
     
     if (containsIgnoreCase(weather, "wind") || containsIgnoreCase(weather, "breezy")) {
-      lcd.write(4);
+      tempString += (char)4;
     } 
     
     if (containsIgnoreCase(weather, "thunder") || containsIgnoreCase(weather, "storm")) {
-      lcd.write(5);
+      tempString += (char)5;
     }
 
+    if (containsIgnoreCase(timestamp, "night")) {
+      tempString += (char)6;
+    }
+
+  printCenter(tempString, 0);
   printCenter(weather, 1);
 
   delay(20000);
