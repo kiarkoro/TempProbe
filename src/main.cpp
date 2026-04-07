@@ -2,11 +2,11 @@
 #include "LiquidCrystal_I2C.h" // https://github.com/johnrickman/LiquidCrystal_I2C.git
 #include "WiFi.h"
 #include <HTTPClient.h>
-#include <WiFiClientSecure.h>
+// #include <WiFiClientSecure.h>
 #include <ArduinoJson.h>
 #include "icons.h"
 
-int lcdColumns = 16;
+const int lcdColumns = 16;
 int lcdRows = 2;
 int tempF = 0;
 
@@ -14,7 +14,7 @@ const unsigned long refreshRate = 1 * 60 * 1000UL; // 1 minute in milliseconds
 unsigned long previousMillis = 0;
 
 String weather = "";
-String timestamp = "";
+String day_night = "";
 
 const char* ssid = "Harmony-Student-Crash";
 const char* password = "Spike-They-Putty-67!";
@@ -37,7 +37,7 @@ bool containsIgnoreCase(String mainString, String subString) {
     }
 }
 
-void getTemperature() {
+void getWeather() {
     HTTPClient client = HTTPClient();
     if (client.begin(api_url)) {
         int httpCode = client.GET();
@@ -49,9 +49,9 @@ void getTemperature() {
         JsonDocument doc;
         deserializeJson(doc, payload);
 
-        timestamp = doc["properties"]["icon"].as<String>();
+        day_night = doc["properties"]["icon"].as<String>();
 
-        Serial.println("Timestamp: " + timestamp);
+        Serial.println("Day/Night: " + day_night);
 
         float tempC = doc["properties"]["temperature"]["value"];
         Serial.println("Temperature in Celsius: " + String(tempC));
@@ -98,13 +98,13 @@ void setup() {
         delay(500);
     }
 
-    getTemperature();
+    getWeather();
 }
 
 void loop() {
     String tempString = String(tempF) + ((char)223) + "F";
 
-    if (containsIgnoreCase(timestamp, "day")) {
+    if (containsIgnoreCase(day_night, "day")) {
         if (containsIgnoreCase(weather, "sun") || containsIgnoreCase(weather, "clear")) {
             tempString += (char)0;
         }
@@ -130,7 +130,7 @@ void loop() {
         tempString += (char)5;
     }
 
-    if (containsIgnoreCase(timestamp, "night")) {
+    if (containsIgnoreCase(day_night, "night")) {
         tempString += (char)6;
     }
 
@@ -142,7 +142,7 @@ void loop() {
 
     if (millis() - previousMillis >= refreshRate) {
         previousMillis = millis(); // Save the time the function was run
-        getTemperature();
+        getWeather();
     }
 
 }
