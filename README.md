@@ -1,5 +1,7 @@
 # Arduino WiFi Weather Display
 
+![alt text](image.png)
+
 - Displays current temperature (°F) and weather description on a 16x2 I2C LCD using an ESP32  
 - Fetches data from weather.gov API  
 
